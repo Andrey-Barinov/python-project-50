@@ -8,5 +8,5 @@ coverage.xml
 .pytest_cache/
 .idea/
 main.py
-file1.json
-file2.json
+tests/fixtures/file1.json
+tests/fixtures/file2.json
