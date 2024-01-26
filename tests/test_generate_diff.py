@@ -1,5 +1,5 @@
 from gendiff.gendiff import generate_diff
-
+from gendiff.gendiff import trans_value
 
 
 json_file1 = "tests/fixtures/file1.json"
@@ -23,3 +23,11 @@ def test_generate_diff_yaml():
     right_result = open(result_file, 'r')
 
     assert generate_diff(yaml_file1, yaml_file2) == right_result.read()
+
+
+def test_trans_value():
+    assert trans_value(True) == 'true'
+
+    assert trans_value(False) == 'false'
+
+    assert trans_value('120.120') == '120.120'

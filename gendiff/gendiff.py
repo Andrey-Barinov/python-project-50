@@ -1,6 +1,15 @@
 from gendiff.parser import parser
 
 
+def trans_value(value):
+    if value is True:
+        return 'true'
+    elif value is False:
+        return 'false'
+    else:
+        return value
+
+
 def generate_str_of_diff(list_of_diff):
     result = ''
 
@@ -32,18 +41,18 @@ def generate_diff(file1, file2):
     for key, value in data1.items():
 
         if key in data2 and value == data2[key]:
-            list_of_diff.append([key, value])
+            list_of_diff.append([key, trans_value(value)])
 
         elif key in data2 and value != data2[key]:
             list_of_diff.append([key, value, data2[key], 'diff_values'])
 
         else:
-            list_of_diff.append([key, value, '-'])
+            list_of_diff.append([key, trans_value(value), '-'])
 
     for key, value in data2.items():
 
         if key not in data1.keys():
 
-            list_of_diff.append([key, value, '+'])
+            list_of_diff.append([key, trans_value(value), '+'])
 
     return generate_str_of_diff(sorted(list_of_diff))
