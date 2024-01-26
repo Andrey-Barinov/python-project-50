@@ -1,4 +1,4 @@
-import json
+from gendiff.parser import parser
 
 
 def generate_str_of_diff(list_of_diff):
@@ -23,26 +23,26 @@ def generate_str_of_diff(list_of_diff):
 
 def generate_diff(file1, file2):
 
-    file1 = json.load(open(file1))
+    data1 = parser(file1)
 
-    file2 = json.load(open(file2))
+    data2 = parser(file2)
 
     list_of_diff = []
 
-    for key, value in file1.items():
+    for key, value in data1.items():
 
-        if key in file2 and value == file2[key]:
+        if key in data2 and value == data2[key]:
             list_of_diff.append([key, value])
 
-        elif key in file2 and value != file2[key]:
-            list_of_diff.append([key, value, file2[key], 'diff_values'])
+        elif key in data2 and value != data2[key]:
+            list_of_diff.append([key, value, data2[key], 'diff_values'])
 
         else:
             list_of_diff.append([key, value, '-'])
 
-    for key, value in file2.items():
+    for key, value in data2.items():
 
-        if key not in file1.keys():
+        if key not in data1.keys():
 
             list_of_diff.append([key, value, '+'])
 
