@@ -1,51 +1,52 @@
-from gendiff.generator import generate_dict_of_diff, change_key
+from gendiff.generator import generate_list_of_diff
 from gendiff.parser import determine_format
-from gendiff.stylish import default_format, trans_value
+from gendiff.transform_func import trans_nested_value, trans_value, trans_type
+from gendiff.formatters.stylish import default_format
+from gendiff.formatters.plain import plain_format, complex_or_str
+from gendiff.formatters.plain import disassemble, assemble, create_dict
+from gendiff.gen_diff import generate_diff
 import json
 import yaml
-
 
 json_file1 = "tests/fixtures/file1.json"
 
 json_file2 = "tests/fixtures/file2.json"
 
+json_file_small = "tests/fixtures/small_file.json"
+
 yaml_file1 = "tests/fixtures/file1.yaml"
 
 yaml_file2 = "tests/fixtures/file2.yaml"
 
+yaml_file_small = "tests/fixtures/small_file.yaml"
+
 result_file = "tests/fixtures/right_result.txt"
 
+result_file_plain = "tests/fixtures/right_result_plain.txt"
 
-def test_change_key():
-    assert change_key({'2': {'3': '#', '4': 2}}) == {'  2': {'  3': '#', '  4': 2}}
 
-    assert change_key({'2': 2, 'x': 1}) == {'  2': 2, '  x': 1}
+def test_generate_diff():
+    right_result = open(result_file, 'r')
 
-def test_generate_dict_of_diff():
-    right_result = {
-        '  common': {'+ follow': False,
-                     '  setting1': 'Value 1',
-                     '- setting2': 200,
-                     '- setting3': True,
-                     '+ setting3': None,
-                     '+ setting4': 'blah blah',
-                     '+ setting5': {'  key5': 'value5'},
-                     '  setting6': {'  doge': {'- wow': '', '+ wow': 'so much'},
-                                    '  key': 'value', '+ ops': 'vops'
-                                    }
-                     },
-        '  group1': {'- baz': 'bas',
-                     '+ baz': 'bars',
-                     '  foo': 'bar',
-                     '- nest': {'  key': 'value'}, '+ nest': 'str'
-                     },
-        '- group2': {'  abc': 12345, '  deep': {'  id': 45}},
-        '+ group3': {'  deep': {'  id': {'  number': 45}}, '  fee': 100500}
-    }
+    right_result = str(right_result.read())
 
-    assert generate_dict_of_diff(json_file1, json_file2) == right_result
+    assert generate_diff(json_file1, yaml_file2) == right_result
 
-    assert generate_dict_of_diff(yaml_file1, yaml_file2) == right_result
+
+def test_generate_list_of_diff():
+    right_result = [
+        {'key': 'common', 'type': 'changed', 'children': [
+                {'key': 'follow', 'type': 'added', 'value': False},
+                {'key': 'setting1', 'type': 'unchanged', 'value': 'Value 1'},
+                {'key': 'setting3', 'type': 'deleted', 'value': True},
+                {'key': 'setting3', 'type': 'added', 'value': None}
+            ]},
+        {'key': 'group2', 'type': 'deleted', 'value': {'abc': 12345}},
+        {'key': 'group3', 'type': 'added', 'value': {'fee': 100500}}]
+
+    assert generate_list_of_diff(
+        json_file_small, yaml_file_small
+    ) == right_result
 
 
 def test_default_format():
@@ -54,12 +55,64 @@ def test_default_format():
     right_result = str(right_result.read())
 
     assert default_format(
-        generate_dict_of_diff(json_file1, json_file2)
+        generate_list_of_diff(json_file1, json_file2)
     ) == right_result
 
     assert default_format(
-        generate_dict_of_diff(yaml_file1, yaml_file2)
+        generate_list_of_diff(yaml_file1, yaml_file2)
     ) == right_result
+
+
+def test_plain():
+    right_result = open(result_file_plain, 'r')
+
+    right_result = str(right_result.read())
+
+    assert plain_format(
+        generate_list_of_diff(json_file1, json_file2)
+    ) == right_result[:-1]
+
+    assert plain_format(
+        generate_list_of_diff(yaml_file1, yaml_file2)
+    ) == right_result[:-1]
+
+
+def test_complex_or_str():
+    assert complex_or_str({'a': '1', 'b': 2}) == "[complex value]"
+
+    assert complex_or_str('hello') == "'hello'"
+
+    assert complex_or_str(25) == 25
+
+
+def test_disassemble():
+    example_value = [
+        {'key': 'common', 'type': 'changed', 'children': [
+            {'key': 'follow', 'type': 'added', 'value': False},
+            {'key': 'setting1', 'type': 'unchanged', 'value': 'Value 1'}]}]
+
+    right_result = ['common.follow', 'added', 'false']
+
+    assert disassemble(example_value) == right_result
+
+
+def test_assemble():
+    assert assemble([1, 2, 3, 4, 5, 6]) == [[1, 2, 3], [4, 5, 6]]
+
+
+def test_create_dict():
+    example_value = [
+        ['common.follow', 'added', 'false'],
+        ['common.setting3', 'removed', 200],
+        ['common.setting3', 'removed', 'true']
+    ]
+
+    right_result = {
+        'common.follow': ['added', 'false'],
+        'common.setting3': ['updated', 200, 'true']
+    }
+
+    assert create_dict(example_value) == right_result
 
 
 def test_trans_value():
@@ -72,6 +125,20 @@ def test_trans_value():
     assert trans_value('120.120') == '120.120'
 
 
+def test_trans_type():
+    assert trans_type('added') == '+ '
+
+    assert trans_type('deleted') == '- '
+
+    assert trans_type('changed') == '  '
+
+
+def test_trans_nested_value():
+    nested_value = {'2': {'3': '#'}, 'x': 1}
+    right_result = '{\n  2: {\n      3: #\n  }\n  x: 1\n}'
+    assert trans_nested_value(nested_value, 2) == right_result
+
+
 def test_determine_format():
     file_json = open("tests/fixtures/file1.json", 'r')
 
@@ -79,4 +146,6 @@ def test_determine_format():
 
     file_yaml = open("tests/fixtures/file1.yaml", 'r')
 
-    assert determine_format(yaml_file1) == yaml.load(file_yaml, Loader=yaml.FullLoader)
+    assert (determine_format(yaml_file1) == yaml.load(
+        file_yaml, Loader=yaml.FullLoader
+    ))
