@@ -8,7 +8,9 @@ def main():
     output_format = select_format(args.format)
     diff = generate_diff(args.first_file, args.second_file, output_format)
 
-    print(diff)
+    print(output_format(diff))
+
+    return output_format(diff)
 
 
 if __name__ == '__main__':
