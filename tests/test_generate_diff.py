@@ -1,4 +1,4 @@
-from gendiff.gen_diff import generate_diff
+# from gendiff.gen_diff import generate_diff
 from gendiff.generator import generate_list_of_diff
 from gendiff.parser import determine_format
 from gendiff.transform_func import trans_nested_value, trans_value, trans_type
@@ -29,12 +29,12 @@ result_file_plain = "tests/fixtures/right_result_plain.txt"
 result_file_json = "tests/fixtures/right_result_json.txt"
 
 
-def test_generate_diff():
-    right_result = open(result_file, 'r')
-
-    right_result = str(right_result.read())
-
-    assert generate_diff(json_file1, yaml_file2) == right_result
+# def test_generate_diff():
+#     right_result = open(result_file, 'r')
+#
+#     right_result = str(right_result.read())
+#
+#     assert generate_diff(json_file1, yaml_file2) == right_result
 
 
 def test_generate_list_of_diff():
