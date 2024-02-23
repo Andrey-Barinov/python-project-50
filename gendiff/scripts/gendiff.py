@@ -1,7 +1,7 @@
+'#!/usr/bin/env python3'
 from gendiff.gen_diff import generate_diff
 from gendiff.formatters.select_format import select_format
 from gendiff.cli import args
-'#!/usr/bin/env python3'
 
 
 def main():
