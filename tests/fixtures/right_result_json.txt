@@ -1,0 +1,75 @@
+{
+  "key": "common",
+  "type": "changed",
+  "children": [
+    {
+      "key": "follow",
+      "type": "added",
+      "value": false
+    },
+    {
+      "key": "setting1",
+      "type": "unchanged",
+      "value": "Value 1"
+    },
+    {
+      "key": "setting2",
+      "type": "deleted",
+      "value": 200
+    },
+    {
+      "key": "setting3",
+      "type": "deleted",
+      "value": true
+    },
+    {
+      "key": "setting3",
+      "type": "added",
+      "value": null
+    },
+    {
+      "key": "setting4",
+      "type": "added",
+      "value": "blah blah"
+    },
+    {
+      "key": "setting5",
+      "type": "added",
+      "value": {
+        "key5": "value5"
+      }
+    },
+    {
+      "key": "setting6",
+      "type": "changed",
+      "children": [
+        {
+          "key": "doge",
+          "type": "changed",
+          "children": [
+            {
+              "key": "wow",
+              "type": "deleted",
+              "value": ""
+            },
+            {
+              "key": "wow",
+              "type": "added",
+              "value": "so much"
+            }
+          ]
+        },
+        {
+          "key": "key",
+          "type": "unchanged",
+          "value": "value"
+        },
+        {
+          "key": "ops",
+          "type": "added",
+          "value": "vops"
+        }
+      ]
+    }
+  ]
+}
