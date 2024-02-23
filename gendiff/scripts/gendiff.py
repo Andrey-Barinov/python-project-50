@@ -10,8 +10,6 @@ def main():
 
     print(output_format(diff))
 
-    return output_format(diff)
-
 
 if __name__ == '__main__':
     main()

@@ -6,5 +6,4 @@ def generate_diff(file1, file2, format_='stylish'):
     output_format = select_format(format_)
     diff = generate_list_of_diff(file1, file2)
 
-    print(output_format(diff))
     return output_format(diff)
