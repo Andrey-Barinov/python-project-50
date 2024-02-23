@@ -1,5 +1,5 @@
 import json
-# import yaml
+import yaml
 
 
 def determine_format(file):
@@ -8,10 +8,10 @@ def determine_format(file):
 
             return json.load(file_json)
 
-    # elif file[-4:] in ['yaml', '.yml']:
-    #     with open(file, 'r') as file_yaml:
-    #
-    #         return yaml.load(file_yaml, Loader=yaml.FullLoader)
+    elif file[-4:] in ['yaml', '.yml']:
+        with open(file, 'r') as file_yaml:
+
+            return yaml.load(file_yaml, Loader=yaml.FullLoader)
 
 
 def parser(file):
