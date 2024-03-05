@@ -29,6 +29,11 @@ result_file_plain = "tests/fixtures/right_result_plain.txt"
 result_file_json = "tests/fixtures/right_result_json.txt"
 
 
+def prepare_file(file):
+    with open(file, 'r') as read_file:
+        parsed_file = parser(read_file, determine_format(file))
+        return parsed_file
+
 
 def test_generate_diff():
     right_result = open(result_file, 'r')
@@ -40,7 +45,7 @@ def test_generate_diff():
 
 def test_generate_list_of_diff():
     right_result = [
-        {'key': 'common', 'type': 'changed', 'children': [
+        {'key': 'common', 'type': 'updated', 'children': [
             {'key': 'follow', 'type': 'added', 'value': False},
             {'key': 'setting1', 'type': 'unchanged', 'value': 'Value 1'},
             {'key': 'setting3', 'type': 'deleted', 'value': True},
@@ -48,9 +53,10 @@ def test_generate_list_of_diff():
         {'key': 'group2', 'type': 'deleted', 'value': {'abc': 12345}},
         {'key': 'group3', 'type': 'added', 'value': {'fee': 100500}}]
 
-    assert generate_list_of_diff(
-        json_file_small, yaml_file_small
-    ) == right_result
+    data1 = prepare_file(json_file_small)
+    data2 = prepare_file(yaml_file_small)
+
+    assert generate_list_of_diff(data1, data2) == right_result
 
 
 def test_default_format():
@@ -58,12 +64,18 @@ def test_default_format():
 
     right_result = str(right_result.read())
 
+    json_data1 = prepare_file(json_file1)
+    json_data2 = prepare_file(json_file2)
+
+    yaml_data1 = prepare_file(yaml_file1)
+    yaml_data2 = prepare_file(yaml_file2)
+
     assert default_format(
-        generate_list_of_diff(json_file1, json_file2)
+        generate_list_of_diff(json_data1, json_data2)
     ) == right_result
 
     assert default_format(
-        generate_list_of_diff(yaml_file1, yaml_file2)
+        generate_list_of_diff(yaml_data1, yaml_data2)
     ) == right_result
 
 
@@ -72,12 +84,18 @@ def test_plain():
 
     right_result = str(right_result.read())
 
+    json_data1 = prepare_file(json_file1)
+    json_data2 = prepare_file(json_file2)
+
+    yaml_data1 = prepare_file(yaml_file1)
+    yaml_data2 = prepare_file(yaml_file2)
+
     assert plain_format(
-        generate_list_of_diff(json_file1, json_file2)
+        generate_list_of_diff(json_data1, json_data2)
     ) == right_result[:-1]
 
     assert plain_format(
-        generate_list_of_diff(yaml_file1, yaml_file2)
+        generate_list_of_diff(yaml_data1, yaml_data2)
     ) == right_result[:-1]
 
 
@@ -91,7 +109,7 @@ def test_complex_or_str():
 
 def test_disassemble():
     example_value = [
-        {'key': 'common', 'type': 'changed', 'children': [
+        {'key': 'common', 'type': 'updated', 'children': [
             {'key': 'follow', 'type': 'added', 'value': False},
             {'key': 'setting1', 'type': 'unchanged', 'value': 'Value 1'}]}]
 
@@ -124,13 +142,19 @@ def test_json_format():
 
     right_result = str(right_result.read())
 
-    assert json_format(
-        generate_list_of_diff(json_file1, json_file2)
-    ) == right_result
+    json_data1 = prepare_file(json_file1)
+    json_data2 = prepare_file(json_file2)
+
+    yaml_data1 = prepare_file(yaml_file1)
+    yaml_data2 = prepare_file(yaml_file2)
 
     assert json_format(
-        generate_list_of_diff(yaml_file1, yaml_file2)
-    ) == right_result
+        generate_list_of_diff(json_data1, json_data2)
+    ) == right_result[:-1]
+
+    assert json_format(
+        generate_list_of_diff(yaml_data1, yaml_data2)
+    ) == right_result[:-1]
 
 
 def test_select_format():
@@ -171,16 +195,15 @@ def test_determine_format():
     assert determine_format("tests/fixtures/file1.yaml") == 'yaml'
 
 
-right_result = open(json_file1, 'r')
-right_result1 = open(yaml_file1, 'r')
+right_result1 = open(json_file1, 'r')
+right_result2 = open(yaml_file1, 'r')
 
 
 def test_parser():
-
     with open(json_file1, 'r') as file_json:
-        assert parser(file_json, 'json') == json.load(right_result)
+        assert parser(file_json, 'json') == json.load(right_result1)
 
     with open(yaml_file1, 'r') as file_yaml:
         assert (parser(file_yaml, 'yaml') == yaml.load(
-            right_result1, Loader=yaml.FullLoader
+            right_result2, Loader=yaml.FullLoader
         ))

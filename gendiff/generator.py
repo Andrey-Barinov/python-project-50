@@ -1,10 +1,4 @@
-from gendiff.parser import parser
-
-
-def generate_list_of_diff(file1, file2):
-    data_from_file1 = parser(file1)
-
-    data_from_file2 = parser(file2)
+def generate_list_of_diff(data1, data2):
 
     def walk(curr_data1, curr_data2):
         result = []
@@ -40,7 +34,7 @@ def generate_list_of_diff(file1, file2):
                                })
             else:
                 result.append({'key': key,
-                               'type': 'changed',
+                               'type': 'updated',
                                'children': walk(
                                    curr_data1[key], curr_data2[key]
                                )
@@ -48,4 +42,4 @@ def generate_list_of_diff(file1, file2):
 
         return result
 
-    return walk(data_from_file1, data_from_file2)
+    return walk(data1, data2)

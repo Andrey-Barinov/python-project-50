@@ -8,7 +8,13 @@ def default_format(list_of_diff, replacer=' '):
 
         for key in current_value:
 
-            if 'value' in key.keys():
+            if key['type'] == 'updated':
+                lines.append(
+                    f"{replacer * spaces_count}{trans_type(key['type'])}"
+                    f"{key['key']}: "
+                    f"{iter_(key['children'], spaces_count + 4)}"
+                )
+            else:
                 if isinstance(key['value'], dict):
                     lines.append(
                         f"{replacer * spaces_count}{trans_type(key['type'])}"
@@ -22,13 +28,6 @@ def default_format(list_of_diff, replacer=' '):
                         f"{key['key']}: "
                         f"{trans_value(key['value'])}"
                     )
-
-            elif 'children' in key.keys():
-                lines.append(
-                    f"{replacer * spaces_count}{trans_type(key['type'])}"
-                    f"{key['key']}: "
-                    f"{iter_(key['children'], spaces_count + 4)}"
-                )
 
         result = itertools.chain(
             "{", lines, [(replacer * (spaces_count - 2)) + "}"]

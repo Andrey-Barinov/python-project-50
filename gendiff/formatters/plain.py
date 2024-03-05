@@ -34,7 +34,7 @@ def disassemble(list_of_diff):
                      trans_value(complex_or_str(key['value']))]
                 )
 
-            elif key['type'] == 'changed' and key.get('children', False):
+            elif key['type'] == 'updated':
 
                 lines.append(iter_(key['children'], path + name + '.'))
 
@@ -67,9 +67,7 @@ def create_dict(assembled_keys):
 
 def plain_format(list_of_diff):
     disassembled_keys = disassemble(list_of_diff)
-
     assembled_keys = assemble(disassembled_keys)
-
     dict_of_keys = create_dict(assembled_keys)
 
     result = ''

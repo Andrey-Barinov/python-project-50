@@ -10,11 +10,6 @@ def determine_format(file):
         return 'yaml'
 
 
-def open_and_read(file):
-    with open(file, 'r') as data:
-        return data
-
-
 def parser(data, file_format):
     if file_format == 'json':
         return json.load(data)

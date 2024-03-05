@@ -1,6 +1,6 @@
 {
   "key": "common",
-  "type": "changed",
+  "type": "updated",
   "children": [
     {
       "key": "follow",
@@ -41,11 +41,11 @@
     },
     {
       "key": "setting6",
-      "type": "changed",
+      "type": "updated",
       "children": [
         {
           "key": "doge",
-          "type": "changed",
+          "type": "updated",
           "children": [
             {
               "key": "wow",
