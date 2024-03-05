@@ -1,6 +1,6 @@
 from gendiff.gen_diff import generate_diff
 from gendiff.generator import generate_list_of_diff
-from gendiff.parser import determine_format
+from gendiff.parser import determine_format, parser
 from gendiff.transform_func import trans_nested_value, trans_value, trans_type
 from gendiff.formatters.stylish import default_format
 from gendiff.formatters.plain import plain_format, complex_or_str
@@ -29,6 +29,7 @@ result_file_plain = "tests/fixtures/right_result_plain.txt"
 result_file_json = "tests/fixtures/right_result_json.txt"
 
 
+
 def test_generate_diff():
     right_result = open(result_file, 'r')
 
@@ -40,10 +41,10 @@ def test_generate_diff():
 def test_generate_list_of_diff():
     right_result = [
         {'key': 'common', 'type': 'changed', 'children': [
-                {'key': 'follow', 'type': 'added', 'value': False},
-                {'key': 'setting1', 'type': 'unchanged', 'value': 'Value 1'},
-                {'key': 'setting3', 'type': 'deleted', 'value': True},
-                {'key': 'setting3', 'type': 'added', 'value': None}]},
+            {'key': 'follow', 'type': 'added', 'value': False},
+            {'key': 'setting1', 'type': 'unchanged', 'value': 'Value 1'},
+            {'key': 'setting3', 'type': 'deleted', 'value': True},
+            {'key': 'setting3', 'type': 'added', 'value': None}]},
         {'key': 'group2', 'type': 'deleted', 'value': {'abc': 12345}},
         {'key': 'group3', 'type': 'added', 'value': {'fee': 100500}}]
 
@@ -165,12 +166,21 @@ def test_trans_nested_value():
 
 
 def test_determine_format():
-    file_json = open("tests/fixtures/file1.json", 'r')
+    assert determine_format("tests/fixtures/file1.json") == 'json'
 
-    assert determine_format(json_file1) == json.load(file_json)
+    assert determine_format("tests/fixtures/file1.yaml") == 'yaml'
 
-    file_yaml = open("tests/fixtures/file1.yaml", 'r')
 
-    assert (determine_format(yaml_file1) == yaml.load(
-        file_yaml, Loader=yaml.FullLoader
-    ))
+right_result = open(json_file1, 'r')
+right_result1 = open(yaml_file1, 'r')
+
+
+def test_parser():
+
+    with open(json_file1, 'r') as file_json:
+        assert parser(file_json, 'json') == json.load(right_result)
+
+    with open(yaml_file1, 'r') as file_yaml:
+        assert (parser(file_yaml, 'yaml') == yaml.load(
+            right_result1, Loader=yaml.FullLoader
+        ))
