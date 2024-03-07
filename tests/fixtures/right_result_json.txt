@@ -1,6 +1,6 @@
 {
   "key": "common",
-  "type": "updated",
+  "type": "nested",
   "children": [
     {
       "key": "follow",
@@ -19,13 +19,9 @@
     },
     {
       "key": "setting3",
-      "type": "deleted",
-      "value": true
-    },
-    {
-      "key": "setting3",
-      "type": "added",
-      "value": null
+      "type": "updated",
+      "value1": true,
+      "value2": null
     },
     {
       "key": "setting4",
@@ -41,21 +37,17 @@
     },
     {
       "key": "setting6",
-      "type": "updated",
+      "type": "nested",
       "children": [
         {
           "key": "doge",
-          "type": "updated",
+          "type": "nested",
           "children": [
             {
               "key": "wow",
-              "type": "deleted",
-              "value": ""
-            },
-            {
-              "key": "wow",
-              "type": "added",
-              "value": "so much"
+              "type": "updated",
+              "value1": "",
+              "value2": "so much"
             }
           ]
         },

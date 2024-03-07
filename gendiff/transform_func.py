@@ -15,12 +15,15 @@ def trans_value(value):
         return value
 
 
-def trans_nested_value(nested_value, spaces_count, replacer=' '):
-    def iter_(current_value, spaces_count1):
+def trans_nested_value(value, spaces_count, replacer=' '):
+    if not isinstance(value, dict):
+        return trans_value(value)
+
+    def iter_(nested_value, spaces_count1):
 
         lines = []
 
-        for key, value in current_value.items():
+        for key, value in nested_value.items():
             if not isinstance(value, dict):
                 lines.append(
                     f"{replacer * spaces_count1}{key}: "
@@ -39,7 +42,7 @@ def trans_nested_value(nested_value, spaces_count, replacer=' '):
 
         return '\n'.join(result)
 
-    return iter_(nested_value, spaces_count)
+    return iter_(value, spaces_count)
 
 
 def trans_type(type_of_key):

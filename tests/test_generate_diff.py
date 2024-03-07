@@ -4,7 +4,7 @@ from gendiff.parser import determine_format, parser
 from gendiff.transform_func import trans_nested_value, trans_value, trans_type
 from gendiff.formatters.stylish import default_format
 from gendiff.formatters.plain import plain_format, complex_or_str
-from gendiff.formatters.plain import disassemble, assemble, create_dict
+from gendiff.formatters.plain import disassemble, assemble
 from gendiff.formatters.json import json_format
 from gendiff.formatters.select_format import select_format
 import json
@@ -45,11 +45,14 @@ def test_generate_diff():
 
 def test_generate_list_of_diff():
     right_result = [
-        {'key': 'common', 'type': 'updated', 'children': [
+        {'key': 'common', 'type': 'nested', 'children': [
             {'key': 'follow', 'type': 'added', 'value': False},
             {'key': 'setting1', 'type': 'unchanged', 'value': 'Value 1'},
-            {'key': 'setting3', 'type': 'deleted', 'value': True},
-            {'key': 'setting3', 'type': 'added', 'value': None}]},
+            {
+                'key': 'setting3',
+                'type': 'updated',
+                'value1': True,
+                'value2': None}]},
         {'key': 'group2', 'type': 'deleted', 'value': {'abc': 12345}},
         {'key': 'group3', 'type': 'added', 'value': {'fee': 100500}}]
 
@@ -92,11 +95,11 @@ def test_plain():
 
     assert plain_format(
         generate_list_of_diff(json_data1, json_data2)
-    ) == right_result[:-1]
+    ) == right_result
 
     assert plain_format(
         generate_list_of_diff(yaml_data1, yaml_data2)
-    ) == right_result[:-1]
+    ) == right_result
 
 
 def test_complex_or_str():
@@ -109,7 +112,7 @@ def test_complex_or_str():
 
 def test_disassemble():
     example_value = [
-        {'key': 'common', 'type': 'updated', 'children': [
+        {'key': 'common', 'type': 'nested', 'children': [
             {'key': 'follow', 'type': 'added', 'value': False},
             {'key': 'setting1', 'type': 'unchanged', 'value': 'Value 1'}]}]
 
@@ -120,21 +123,6 @@ def test_disassemble():
 
 def test_assemble():
     assert assemble([1, 2, 3, 4, 5, 6]) == [[1, 2, 3], [4, 5, 6]]
-
-
-def test_create_dict():
-    example_value = [
-        ['common.follow', 'added', 'false'],
-        ['common.setting3', 'removed', 200],
-        ['common.setting3', 'removed', 'true']
-    ]
-
-    right_result = {
-        'common.follow': ['added', 'false'],
-        'common.setting3': ['updated', 200, 'true']
-    }
-
-    assert create_dict(example_value) == right_result
 
 
 def test_json_format():
@@ -150,11 +138,11 @@ def test_json_format():
 
     assert json_format(
         generate_list_of_diff(json_data1, json_data2)
-    ) == right_result[:-1]
+    ) == right_result
 
     assert json_format(
         generate_list_of_diff(yaml_data1, yaml_data2)
-    ) == right_result[:-1]
+    ) == right_result
 
 
 def test_select_format():

@@ -33,8 +33,17 @@ def disassemble(list_of_diff):
                      'removed',
                      trans_value(complex_or_str(key['value']))]
                 )
-
             elif key['type'] == 'updated':
+
+                lines.append(
+                    [path + name,
+                     'updated',
+                     [trans_value(complex_or_str(key['value1'])),
+                      trans_value(complex_or_str(key['value2']))]
+                     ]
+                )
+
+            elif key['type'] == 'nested':
 
                 lines.append(iter_(key['children'], path + name + '.'))
 
@@ -52,36 +61,23 @@ def assemble(list_of_keys, n=3):
     return result
 
 
-def create_dict(assembled_keys):
-    result = {}
-
-    for key in assembled_keys:
-        if result.get(key[0], False):
-            result[key[0]][0] = 'updated'
-            result[key[0]].append(key[2])
-        else:
-            result[key[0]] = [key[1], key[2]]
-
-    return result
-
-
 def plain_format(list_of_diff):
     disassembled_keys = disassemble(list_of_diff)
     assembled_keys = assemble(disassembled_keys)
-    dict_of_keys = create_dict(assembled_keys)
 
     result = ''
 
-    for key, val in dict_of_keys.items():
+    for key in assembled_keys:
 
-        if val[0] == 'added':
-            result += f"Property '{key}' "
-            result += f"was added with value: {val[1]}\n"
+        if key[1] == 'added':
+            result += f"Property '{key[0]}' "
+            result += f"was added with value: {key[2]}\n"
 
-        elif val[0] == 'removed':
-            result += f"Property '{key}' was removed\n"
+        elif key[1] == 'removed':
+            result += f"Property '{key[0]}' was removed\n"
 
         else:
-            result += f"Property '{key}' "
-            result += f"was updated. From {val[1]} to {val[2]}\n"
+            result += f"Property '{key[0]}' "
+            result += f"was updated. From {key[2][0]} to {key[2][1]}\n"
+
     return result[:-1]
